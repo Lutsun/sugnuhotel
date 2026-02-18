@@ -1,0 +1,73 @@
+{{-- resources/views/layouts/partials/header.blade.php --}}
+<header class="header">
+    <div class="header-top">
+        <div class="container">
+            <div class="header-top-content">
+                <div class="contact-info">
+                    <a href="tel:+221781234567"><i class="fas fa-phone-alt"></i> +221 78 123 45 67</a>
+                    <a href="mailto:contact@sugnuhotel.com"><i class="fas fa-envelope"></i> contact@sugnuhotel.com</a>
+                </div>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <nav class="navbar">
+        <div class="container">
+            <a href="{{ route('home') }}" class="logo">
+                <span class="logo-text">SUGNU<span class="highlight">HOTEL</span></span>
+                <span class="logo-sub">Luxe & Confort</span>
+            </a>
+            
+            <div class="nav-menu" id="navMenu">
+                <ul class="nav-links">
+                    <li><a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">Accueil</a></li>
+                    <li><a href="{{ route('rooms') }}">Chambres & Suites</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#about">À propos</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                
+                <div class="nav-actions">
+                    @auth
+                        <div class="user-menu">
+                            <button class="user-btn">
+                                <i class="fas fa-user-circle"></i>
+                                <span>{{ Auth::user()->name }}</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="user-dropdown">
+                                <a href="{{ route('my.reservations') }}"><i class="fas fa-calendar-check"></i> Mes réservations</a>
+                                <a href="{{ route('profile.show') }}"><i class="fas fa-user"></i> Mon profil</a>
+                                @if(Auth::user()->role === 'admin')
+                                    <a href="{{ route('admin.dashboard') }}"><i class="fas fa-cog"></i> Administration</a>
+                                @endif
+                                @if(Auth::user()->role === 'receptionist')
+                                    <a href="{{ route('reception.dashboard') }}"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a>
+                                @endif
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
+                                </form>
+                            </div>
+                        </div>
+                    @else
+                        <a href="{{ route('login') }}" class="btn-login"><i class="fas fa-sign-in-alt"></i> Connexion</a>
+                        <a href="{{ route('register') }}" class="btn-register">S'inscrire</a>
+                    @endauth
+                    
+                    <button class="menu-toggle" id="menuToggle">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>

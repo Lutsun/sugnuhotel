@@ -1,52 +1,181 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+@extends('layouts.app')
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+@section('title', 'Inscription - SugnuHotel')
+@section('body-class', 'auth-page')
+
+{{-- Désactiver le header et le footer --}}
+@php
+    $hideHeader = true;
+    $hideFooter = true;
+@endphp
+
+@section('content')
+<div class="auth-section">
+    <div class="auth-container register-container">
+        {{-- Colonne gauche avec formulaire --}}
+        <div class="auth-form">
+            <div class="auth-form-header">
+                <a href="{{ route('home') }}" class="auth-logo">
+                    <span class="logo-text">SUGNU<span class="highlight">HOTEL</span></span>
+                </a>
+                <h3>Créer un compte</h3>
+                <p>Rejoignez-nous pour profiter d'avantages exclusifs</p>
+            </div>
+
+            <form method="POST" action="{{ route('register') }}" class="auth-form-body">
+                @csrf
+
+                {{-- Nom complet --}}
+                <div class="form-group">
+                    <label for="name">
+                        <i class="fas fa-user"></i>
+                        Nom complet
+                    </label>
+                    <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" 
+                           name="name" value="{{ old('name') }}" required autocomplete="name" autofocus
+                           placeholder="Jean Dupont">
+                    @error('name')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
+
+                {{-- Email --}}
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i>
+                        Adresse email
+                    </label>
+                    <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" 
+                           name="email" value="{{ old('email') }}" required autocomplete="email"
+                           placeholder="exemple@email.com">
+                    @error('email')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
+
+                {{-- Téléphone --}}
+                <div class="form-group">
+                    <label for="phone">
+                        <i class="fas fa-phone"></i>
+                        Téléphone (optionnel)
+                    </label>
+                    <input id="phone" type="tel" class="form-control @error('phone') is-invalid @enderror" 
+                           name="phone" value="{{ old('phone') }}" 
+                           placeholder="+221 78 123 45 67">
+                    @error('phone')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
+
+                {{-- Mot de passe --}}
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i>
+                        Mot de passe
+                    </label>
+                    <div class="password-input-wrapper">
+                        <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" 
+                               name="password" required autocomplete="new-password"
+                               placeholder="••••••••">
+                        <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                    @error('password')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
+
+                {{-- Confirmation mot de passe --}}
+                <div class="form-group">
+                    <label for="password-confirm">
+                        <i class="fas fa-lock"></i>
+                        Confirmer le mot de passe
+                    </label>
+                    <div class="password-input-wrapper">
+                        <input id="password-confirm" type="password" class="form-control" 
+                               name="password_confirmation" required autocomplete="new-password"
+                               placeholder="••••••••">
+                        <button type="button" class="password-toggle" onclick="togglePassword('password-confirm')">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Conditions --}}
+                <div class="form-group terms-group">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" name="terms" id="terms" required>
+                        <label for="terms">
+                            J'accepte les <a href="#" target="_blank">conditions d'utilisation</a> 
+                            et la <a href="#" target="_blank">politique de confidentialité</a>
+                        </label>
+                    </div>
+                </div>
+
+                {{-- Bouton d'inscription --}}
+                <button type="submit" class="btn-auth">
+                    <span>Créer mon compte</span>
+                    <i class="fas fa-user-plus"></i>
+                </button>
+
+                {{-- Séparateur --}}
+                <div class="auth-divider">
+                    <span>ou</span>
+                </div>
+
+                {{-- Lien vers connexion --}}
+                <div class="auth-redirect">
+                    <p>Déjà membre ?</p>
+                    <a href="{{ route('login') }}" class="btn-login-link">
+                        Se connecter <i class="fas fa-sign-in-alt"></i>
+                    </a>
+                </div>
+            </form>
         </div>
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        {{-- Colonne droite avec image --}}
+        <div class="auth-image" style="background-image: url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')">
+            <div class="auth-image-overlay">
+                <div class="auth-image-content">
+                    <a href="{{ route('home') }}" class="auth-back-home">
+                        <i class="fas fa-arrow-left"></i> Retour à l'accueil
+                    </a>
+                    <h2>Rejoignez l'expérience SugnuHotel</h2>
+                    <div class="benefits-list">
+                        <div class="benefit-item">
+                            <i class="fas fa-gem"></i>
+                            <div>
+                                <h4>Avantages membres</h4>
+                                <p>Accédez à des offres exclusives et des réductions</p>
+                            </div>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-calendar-check"></i>
+                            <div>
+                                <h4>Réservations simplifiées</h4>
+                                <p>Gérez vos séjours en quelques clics</p>
+                            </div>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-star"></i>
+                            <div>
+                                <h4>Programme de fidélité</h4>
+                                <p>Cumulez des points et gagnez des nuits gratuites</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+    </div>
+</div>
+@endsection
