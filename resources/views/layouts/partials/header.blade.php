@@ -1,21 +1,4 @@
-{{-- resources/views/layouts/partials/header.blade.php --}}
 <header class="header">
-    <div class="header-top">
-        <div class="container">
-            <div class="header-top-content">
-                <div class="contact-info">
-                    <a href="tel:+221781234567"><i class="fas fa-phone-alt"></i> +221 78 123 45 67</a>
-                    <a href="mailto:contact@sugnuhotel.com"><i class="fas fa-envelope"></i> contact@sugnuhotel.com</a>
-                </div>
-                <div class="social-links">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                </div>
-            </div>
-        </div>
-    </div>
     
     <nav class="navbar">
         <div class="container">

@@ -50,4 +50,12 @@ Route::middleware(['auth', 'role:admin,receptionist'])->prefix('reception')->nam
     Route::post('/reservations/{reservation}/checkout', [App\Http\Controllers\Reception\ReservationController::class, 'checkOut'])->name('reservations.checkout');
 });
 
+// ===== ROUTES DE PROFIL =====
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
 require __DIR__.'/auth.php';

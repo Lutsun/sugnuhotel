@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/Auth/AuthenticatedSessionController.php
 
 namespace App\Http\Controllers\Auth;
 
@@ -28,7 +29,17 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Redirection personnalisée selon le rôle
+        $user = Auth::user();
+        
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->role === 'receptionist') {
+            return redirect()->route('reception.dashboard');
+        } else {
+            // Pour les clients, rediriger vers la page d'accueil
+            return redirect()->intended(route('home'));
+        }
     }
 
     /**
