@@ -58,20 +58,11 @@ class AdminUserSeeder extends Seeder
             [
                 'name' => 'Mamadou Ndiaye',
                 'email' => 'mamadou.ndiaye@email.com',
+                'password' => Hash::make('password123'),
+                'role' => 'client',
                 'phone' => '+221 77 234 56 78',
-                'address' => 'Saint-Louis, Sénégal'
-            ],
-            [
-                'name' => 'Aïssatou Diallo',
-                'email' => 'aissatou.diallo@email.com',
-                'phone' => '+221 78 345 67 89',
-                'address' => 'Dakar, Sénégal'
-            ],
-            [
-                'name' => 'Omar Sall',
-                'email' => 'omar.sall@email.com',
-                'phone' => '+221 70 456 78 90',
-                'address' => 'Thiès, Sénégal'
+                'address' => 'Saint-Louis, Sénégal',
+                'email_verified_at' => now(),
             ],
         ];
 

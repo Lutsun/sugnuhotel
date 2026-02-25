@@ -1,3 +1,17 @@
+@php
+    $hideHeader = false;
+    $currentRoute = request()->route()->getName();
+    
+    // Pages où le header doit être caché
+    $hiddenRoutes = ['admin.dashboard', 'reception.dashboard', 'login', 'register', 'profile.show', 'profile.edit', 'booking.my-reservations','booking.confirm'];
+    
+    if (in_array($currentRoute, $hiddenRoutes)) {
+        $hideHeader = true;
+    }
+@endphp
+
+@if(!$hideHeader)
+
 <header class="header">
     
     <nav class="navbar">
@@ -10,7 +24,7 @@
             <div class="nav-menu" id="navMenu">
                 <ul class="nav-links">
                     <li><a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">Accueil</a></li>
-                    <li><a href="{{ route('rooms') }}">Chambres & Suites</a></li>
+                    <li><a href="#rooms">Chambres & Suites</a></li>
                     <li><a href="#services">Services</a></li>
                     <li><a href="#about">À propos</a></li>
                     <li><a href="#contact">Contact</a></li>
@@ -25,7 +39,7 @@
                                 <i class="fas fa-chevron-down"></i>
                             </button>
                             <div class="user-dropdown">
-                                <a href="{{ route('my.reservations') }}"><i class="fas fa-calendar-check"></i> Mes réservations</a>
+                                <a href="{{ route('booking.my-reservations') }}"><i class="fas fa-calendar-check"></i> Mes réservations</a>
                                 <a href="{{ route('profile.show') }}"><i class="fas fa-user"></i> Mon profil</a>
                                 @if(Auth::user()->role === 'admin')
                                     <a href="{{ route('admin.dashboard') }}"><i class="fas fa-cog"></i> Administration</a>
@@ -54,3 +68,4 @@
         </div>
     </nav>
 </header>
+@endif

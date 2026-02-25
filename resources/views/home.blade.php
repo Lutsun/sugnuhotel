@@ -363,66 +363,6 @@
     </div>
 </section>
 
-{{-- Section Témoignages --}}
-<section class="testimonials-section">
-    <div class="container">
-        <div class="section-header" data-aos="fade-up">
-            <span class="section-tag">Témoignages</span>
-            <h2 class="section-title" style="color: white;">Ce que nos clients disent</h2>
-        </div>
-        
-        <div class="swiper testimonials-slider" data-aos="fade-up">
-            <div class="swiper-wrapper">
-                <div class="swiper-slide">
-                    <div class="testimonial-card">
-                        <div class="testimonial-image">
-                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Client">
-                        </div>
-                        <p class="testimonial-text">
-                            "Un séjour exceptionnel ! Le personnel est aux petits soins, 
-                            les chambres sont magnifiques et la vue sur l'océan est à couper le souffle. 
-                            Je reviendrai sans hésiter."
-                        </p>
-                        <h4 class="testimonial-author">Aïssatou Diallo</h4>
-                        <p class="testimonial-position">Cliente depuis 3 ans</p>
-                    </div>
-                </div>
-                
-                <div class="swiper-slide">
-                    <div class="testimonial-card">
-                        <div class="testimonial-image">
-                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Client">
-                        </div>
-                        <p class="testimonial-text">
-                            "Le meilleur hôtel de Dakar ! Le restaurant est incroyable, 
-                            le spa est un havre de paix. Je recommande vivement la suite présidentielle 
-                            pour une occasion spéciale."
-                        </p>
-                        <h4 class="testimonial-author">Mamadou Ndiaye</h4>
-                        <p class="testimonial-position">Homme d'affaires</p>
-                    </div>
-                </div>
-                
-                <div class="swiper-slide">
-                    <div class="testimonial-card">
-                        <div class="testimonial-image">
-                            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Client">
-                        </div>
-                        <p class="testimonial-text">
-                            "Un accueil chaleureux et professionnel. L'emplacement est parfait, 
-                            proche de toutes les attractions. Le rapport qualité-prix est excellent. 
-                            Merci à toute l'équipe !"
-                        </p>
-                        <h4 class="testimonial-author">Fatou Sarr</h4>
-                        <p class="testimonial-position">Touriste</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="swiper-pagination"></div>
-        </div>
-    </div>
-</section>
 
 {{-- Section Appel à l'action --}}
 <section class="cta-section">

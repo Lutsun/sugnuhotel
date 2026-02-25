@@ -21,38 +21,97 @@ class BookingController extends Controller
      * Rechercher les chambres disponibles
      */
     public function search(Request $request)
-    {
-        $request->validate([
-            'check_in' => 'required|date|after_or_equal:today',
-            'check_out' => 'required|date|after:check_in',
-            'adults' => 'required|integer|min:1|max:10',
-            'children' => 'nullable|integer|min:0|max:10'
-        ]);
+{
+    $request->validate([
+        'check_in' => 'required|date|after_or_equal:today',
+        'check_out' => 'required|date|after:check_in',
+        'adults' => 'required|integer|min:1|max:10',
+        'children' => 'nullable|integer|min:0|max:10'
+    ]);
 
-        $checkIn = Carbon::parse($request->check_in);
-        $checkOut = Carbon::parse($request->check_out);
-        $nights = $checkIn->diffInDays($checkOut);
-        
-        // Récupérer les chambres disponibles
-        $availableRooms = $this->getAvailableRooms(
-            $checkIn, 
-            $checkOut, 
-            $request->adults + ($request->children ?? 0)
-        );
-        
-        // Sauvegarder la recherche en session
-        session([
-            'search' => [
-                'check_in' => $checkIn->format('Y-m-d'),
-                'check_out' => $checkOut->format('Y-m-d'),
-                'adults' => $request->adults,
-                'children' => $request->children ?? 0,
-                'nights' => $nights
-            ]
-        ]);
-        
-        return view('booking.search', compact('availableRooms', 'nights'));
+    $checkIn = Carbon::parse($request->check_in);
+    $checkOut = Carbon::parse($request->check_out);
+    $nights = $checkIn->diffInDays($checkOut);
+    $capacity = $request->adults + ($request->children ?? 0);
+    
+    // Récupérer les IDs des chambres réservées
+    $reservedRoomIds = Reservation::whereIn('status', ['confirmed', 'checked_in'])
+        ->where(function ($query) use ($checkIn, $checkOut) {
+            $query->whereBetween('check_in_date', [$checkIn, $checkOut])
+                  ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
+                  ->orWhere(function ($q) use ($checkIn, $checkOut) {
+                      $q->where('check_in_date', '<=', $checkIn)
+                        ->where('check_out_date', '>=', $checkOut);
+                  });
+        })
+        ->pluck('room_id')
+        ->toArray();
+    
+    // Construire la requête
+    $query = Room::with(['roomType', 'images'])
+        ->whereNotIn('id', $reservedRoomIds)
+        ->where('status', 'available')
+        ->where('max_occupancy', '>=', $capacity);
+    
+    // Appliquer les filtres de prix
+    if ($request->filled('min_price')) {
+        $query->where('price_per_night', '>=', $request->min_price);
     }
+    
+    if ($request->filled('max_price')) {
+        $query->where('price_per_night', '<=', $request->max_price);
+    }
+    
+    // Appliquer les filtres de type de chambre
+    if ($request->filled('room_types')) {
+        $query->whereIn('room_type_id', $request->room_types);
+    }
+    
+    // Appliquer les filtres d'équipements
+    if ($request->has('wifi')) {
+        $query->where('has_wifi', true);
+    }
+    if ($request->has('tv')) {
+        $query->where('has_tv', true);
+    }
+    if ($request->has('air_conditioning')) {
+        $query->where('has_air_conditioning', true);
+    }
+    if ($request->has('minibar')) {
+        $query->where('has_minibar', true);
+    }
+    
+    // Appliquer le tri
+    switch ($request->sort) {
+        case 'price_desc':
+            $query->orderBy('price_per_night', 'desc');
+            break;
+        case 'capacity_asc':
+            $query->orderBy('max_occupancy', 'asc');
+            break;
+        case 'capacity_desc':
+            $query->orderBy('max_occupancy', 'desc');
+            break;
+        default: // price_asc
+            $query->orderBy('price_per_night', 'asc');
+    }
+    
+    // Exécuter avec pagination
+    $availableRooms = $query->paginate(9)->withQueryString();
+    
+    // Sauvegarder la recherche en session
+    session([
+        'search' => [
+            'check_in' => $checkIn->format('Y-m-d'),
+            'check_out' => $checkOut->format('Y-m-d'),
+            'adults' => $request->adults,
+            'children' => $request->children ?? 0,
+            'nights' => $nights
+        ]
+    ]);
+    
+    return view('booking.search', compact('availableRooms', 'checkIn', 'checkOut', 'nights'));
+}
 
     /**
      * Vérifier la disponibilité en temps réel
@@ -78,24 +137,39 @@ class BookingController extends Controller
         }
     }
 
-    /**
-     * Page de confirmation avant réservation
-     */
-    public function confirm($roomId)
-    {
-        $room = Room::with('roomType')->findOrFail($roomId);
-        $search = session('search');
-        
-        if (!$search) {
-            return redirect()->route('home')->with('error', 'Veuillez d\'abord effectuer une recherche');
-        }
-        
-        $services = Service::where('is_active', true)->get();
-        $nights = $search['nights'];
-        $roomPrice = $room->price_per_night * $nights;
-        
-        return view('booking.confirm', compact('room', 'search', 'services', 'nights', 'roomPrice'));
+   /**
+ * Page de confirmation avant réservation
+ */
+public function confirm($roomId)
+{
+    $room = Room::with('roomType')->findOrFail($roomId);
+    $search = session('search');
+    
+    if (!$search) {
+        return redirect()->route('home')->with('error', 'Veuillez d\'abord effectuer une recherche');
     }
+    
+    $services = Service::where('is_active', true)->get();
+    $nights = $search['nights'];
+    $roomPrice = $room->price_per_night * $nights;
+    
+    // Extraire les données de la session
+    $checkIn = $search['check_in'];
+    $checkOut = $search['check_out'];
+    $adults = $search['adults'];
+    $children = $search['children'];
+    
+    return view('booking.confirm', compact(
+        'room', 
+        'services', 
+        'nights', 
+        'roomPrice',
+        'checkIn',
+        'checkOut',
+        'adults',
+        'children'
+    ));
+}
 
     /**
      * Enregistrer la réservation
@@ -223,16 +297,25 @@ class BookingController extends Controller
     /**
      * Annuler une réservation
      */
+    /** */
     public function cancel($id)
     {
         $reservation = Reservation::where('user_id', Auth::id())->findOrFail($id);
         
-        // Vérifier si l'annulation est possible (ex: plus de 24h avant)
+        // Vérifier si l'annulation est possible
         $checkIn = Carbon::parse($reservation->check_in_date);
         $now = Carbon::now();
         
-        if ($checkIn->diffInHours($now) < 24) {
-            return back()->with('error', 'Impossible d\'annuler une réservation moins de 24h avant l\'arrivée.');
+        // Calculer la différence en heures (positive si dans le futur)
+        $hoursUntilCheckIn = $now->diffInHours($checkIn, false); // false = retourne négatif si dépassé
+        
+        // Si la date est passée (négatif) ou dans moins de 24h (positif mais < 24)
+        if ($hoursUntilCheckIn < 24) {
+            if ($hoursUntilCheckIn < 0) {
+                return back()->with('error', 'Impossible d\'annuler une réservation déjà passée.');
+            } else {
+                return back()->with('error', 'Impossible d\'annuler une réservation moins de 24h avant l\'arrivée. (' . floor($hoursUntilCheckIn) . 'h restantes)');
+            }
         }
         
         if (!in_array($reservation->status, ['pending', 'confirmed'])) {
@@ -249,14 +332,8 @@ class BookingController extends Controller
             
             DB::commit();
             
-            // Envoyer email d'annulation
-            try {
-                Mail::to(Auth::user()->email)->send(new \App\Mail\ReservationCancelled($reservation));
-            } catch (\Exception $e) {
-                Log::error('Erreur envoi email annulation: ' . $e->getMessage());
-            }
-            
-            return back()->with('success', 'Réservation annulée avec succès.');
+            return redirect()->route('booking.my-reservations')
+                            ->with('success', 'Réservation annulée avec succès.');
             
         } catch (\Exception $e) {
             DB::rollBack();

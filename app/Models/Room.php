@@ -5,6 +5,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon; // IMPORTANT: Ajoutez cette ligne en haut
 
 class Room extends Model
 {
@@ -25,7 +26,6 @@ class Room extends Model
 
     /**
      * Relation avec le type de chambre
-     * Une chambre appartient à un type
      */
     public function roomType()
     {
@@ -34,7 +34,6 @@ class Room extends Model
 
     /**
      * Relation avec les réservations
-     * Une chambre peut avoir plusieurs réservations
      */
     public function reservations()
     {
@@ -43,7 +42,6 @@ class Room extends Model
 
     /**
      * Relation avec les images
-     * Une chambre peut avoir plusieurs images
      */
     public function images()
     {
@@ -64,5 +62,46 @@ class Room extends Model
     public function scopeOccupied($query)
     {
         return $query->where('status', 'occupied');
+    }
+
+    /**
+     * Vérifier si la chambre est disponible pour une période donnée
+     * 
+     * @param string|\Carbon\Carbon $checkIn Date d'arrivée
+     * @param string|\Carbon\Carbon $checkOut Date de départ
+     * @return bool
+     */
+    public function isAvailable($checkIn, $checkOut)
+    {
+        // Convertir en objets Carbon si ce sont des strings
+        if (!$checkIn instanceof Carbon) {
+            $checkIn = Carbon::parse($checkIn);
+        }
+        if (!$checkOut instanceof Carbon) {
+            $checkOut = Carbon::parse($checkOut);
+        }
+        
+        // Vérifier les réservations existantes qui chevauchent la période
+        $existingReservations = $this->reservations()
+            ->whereIn('status', ['confirmed', 'checked_in']) // Statuts qui occupent la chambre
+            ->where(function ($query) use ($checkIn, $checkOut) {
+                $query->whereBetween('check_in_date', [$checkIn, $checkOut])
+                      ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
+                      ->orWhere(function ($q) use ($checkIn, $checkOut) {
+                          $q->where('check_in_date', '<=', $checkIn)
+                            ->where('check_out_date', '>=', $checkOut);
+                      });
+            })
+            ->count();
+        
+        return $existingReservations === 0;
+    }
+
+    /**
+     * Obtenir le prix total pour un nombre de nuits
+     */
+    public function getPriceForNights($nights)
+    {
+        return $this->price_per_night * $nights;
     }
 }

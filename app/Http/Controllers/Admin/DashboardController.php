@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/Admin/DashboardController.php
 
 namespace App\Http\Controllers\Admin;
 
@@ -57,6 +56,7 @@ class DashboardController extends Controller
         // Statistiques utilisateurs
         $totalUsers = User::count();
         $newUsersThisMonth = User::whereMonth('created_at', Carbon::now()->month)->count();
+
         
         return view('admin.dashboard', compact(
             'totalRooms',

@@ -16,9 +16,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/booking/check-availability', [BookingController::class, 'checkAvailability'])->name('booking.check');
     Route::get('/booking/confirm/{room}', [BookingController::class, 'confirm'])->name('booking.confirm');
     Route::post('/booking/store', [BookingController::class, 'store'])->name('booking.store');
-    Route::get('/my-reservations', [BookingController::class, 'myReservations'])->name('my.reservations');
+    Route::get('/booking/my-reservations', [BookingController::class, 'myReservations'])->name('booking.my-reservations');
     Route::get('/reservation/{id}', [BookingController::class, 'show'])->name('reservation.show');
-    Route::post('/reservation/{id}/cancel', [BookingController::class, 'cancel'])->name('reservation.cancel');
+    Route::delete('/reservation/{id}/cancel', [BookingController::class, 'cancel'])->name('reservation.cancel');
 });
 
 // Routes Admin
