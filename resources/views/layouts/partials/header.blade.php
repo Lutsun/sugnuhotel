@@ -3,7 +3,7 @@
     $currentRoute = request()->route()->getName();
     
     // Pages où le header doit être caché
-    $hiddenRoutes = ['admin.dashboard', 'reception.dashboard', 'login', 'register', 'profile.show', 'profile.edit', 'booking.my-reservations','booking.confirm'];
+    $hiddenRoutes = ['admin.dashboard', 'reception.dashboard', 'login', 'register', 'profile.show', 'profile.edit', 'booking.my-reservations','booking.confirm','booking.search','room.show','room.index'];
     
     if (in_array($currentRoute, $hiddenRoutes)) {
         $hideHeader = true;

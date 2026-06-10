@@ -385,7 +385,7 @@
                 <div class="booking-sidebar">
                     <h3>Réserver cette chambre</h3>
                     
-                    <form id="bookingForm" method="GET" action="{{ route('booking.confirm', $room->id) }}">
+                    <form id="bookingForm" method="GET" action="{{ route('booking.search', $room->id) }}">
                         @csrf
                         
                         {{-- Dates --}}

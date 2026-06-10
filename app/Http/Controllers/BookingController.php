@@ -298,34 +298,59 @@ public function confirm($roomId)
      * Annuler une réservation
      */
     /** */
+   
     public function cancel($id)
     {
-        $reservation = Reservation::where('user_id', Auth::id())->findOrFail($id);
-        
-        // Vérifier si l'annulation est possible
-        $checkIn = Carbon::parse($reservation->check_in_date);
-        $now = Carbon::now();
-        
-        // Calculer la différence en heures (positive si dans le futur)
-        $hoursUntilCheckIn = $now->diffInHours($checkIn, false); // false = retourne négatif si dépassé
-        
-        // Si la date est passée (négatif) ou dans moins de 24h (positif mais < 24)
-        if ($hoursUntilCheckIn < 24) {
+        try {
+            // Récupérer la réservation
+            $reservation = Reservation::where('user_id', Auth::id())->findOrFail($id);
+            
+            // Log pour debug
+            Log::info('Tentative annulation', [
+                'reservation_id' => $id,
+                'status_actuel' => $reservation->status,
+                'user_id' => Auth::id()
+            ]);
+            
+            // Vérifier si l'annulation est possible
+            $checkIn = Carbon::parse($reservation->check_in_date);
+            $now = Carbon::now();
+            
+            // Calculer la différence en heures (valeur absolue)
+            $hoursUntilCheckIn = $now->diffInHours($checkIn, false);
+            
+            // Si la date est passée (différence négative)
             if ($hoursUntilCheckIn < 0) {
                 return back()->with('error', 'Impossible d\'annuler une réservation déjà passée.');
-            } else {
-                return back()->with('error', 'Impossible d\'annuler une réservation moins de 24h avant l\'arrivée. (' . floor($hoursUntilCheckIn) . 'h restantes)');
             }
-        }
-        
-        if (!in_array($reservation->status, ['pending', 'confirmed'])) {
-            return back()->with('error', 'Cette réservation ne peut pas être annulée.');
-        }
-        
-        DB::beginTransaction();
-        
-        try {
-            $reservation->update(['status' => 'cancelled']);
+            
+            // Si moins de 24h avant l'arrivée
+            if ($hoursUntilCheckIn < 24) {
+                $heuresRestantes = floor($hoursUntilCheckIn);
+                return back()->with('error', "Impossible d'annuler une réservation moins de 24h avant l'arrivée. ({$heuresRestantes}h restantes)");
+            }
+            
+            // Vérifier le statut
+            if (!in_array($reservation->status, ['pending', 'confirmed'])) {
+                return back()->with('error', 'Cette réservation ne peut pas être annulée car son statut est "' . $reservation->status . '".');
+            }
+            
+            DB::beginTransaction();
+            
+            // Mettre à jour le statut de la réservation
+            $reservation->update([
+                'status' => 'cancelled',
+                'updated_at' => now()
+            ]);
+            
+            // Vérifier que la mise à jour a bien fonctionné
+            $reservation->refresh();
+            
+            // Log pour vérifier la mise à jour
+            Log::info('Réservation annulée avec succès', [
+                'reservation_id' => $id,
+                'nouveau_status' => $reservation->status
+            ]);
             
             // Libérer la chambre
             $reservation->room->update(['status' => 'available']);
@@ -333,11 +358,12 @@ public function confirm($roomId)
             DB::commit();
             
             return redirect()->route('booking.my-reservations')
-                            ->with('success', 'Réservation annulée avec succès.');
+                            ->with('success', 'Réservation #' . $reservation->reservation_number . ' annulée avec succès.');
             
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Erreur lors de l\'annulation.');
+            Log::error('Erreur annulation: ' . $e->getMessage());
+            return back()->with('error', 'Erreur lors de l\'annulation: ' . $e->getMessage());
         }
     }
 
@@ -364,6 +390,7 @@ public function confirm($roomId)
     /**
      * Récupérer les chambres disponibles
      */
+
     private function getAvailableRooms($checkIn, $checkOut, $capacity)
     {
         $reservedRoomIds = Reservation::whereIn('status', ['confirmed', 'checked_in'])
