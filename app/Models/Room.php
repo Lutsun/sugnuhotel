@@ -104,4 +104,34 @@ class Room extends Model
     {
         return $this->price_per_night * $nights;
     }
+
+    /**
+     * Vérifie la disponibilité d'une chambre pour une période donnée, à partir de son id.
+     * Version centralisée utilisée par l'API (remplace les 3 implémentations dupliquées
+     * trouvées dans BookingController, Reception\ReservationController et Room::isAvailable).
+     *
+     * @param  string|\Carbon\Carbon  $checkIn
+     * @param  string|\Carbon\Carbon  $checkOut
+     * @param  int|null  $excludeReservationId  Ignore cette réservation (utile lors d'une modification)
+     */
+    public static function isAvailableBetween(int $roomId, $checkIn, $checkOut, ?int $excludeReservationId = null): bool
+    {
+        $checkIn = $checkIn instanceof Carbon ? $checkIn : Carbon::parse($checkIn);
+        $checkOut = $checkOut instanceof Carbon ? $checkOut : Carbon::parse($checkOut);
+
+        $conflicting = Reservation::where('room_id', $roomId)
+            ->whereIn('status', ['confirmed', 'checked_in'])
+            ->when($excludeReservationId, fn ($query) => $query->where('id', '!=', $excludeReservationId))
+            ->where(function ($query) use ($checkIn, $checkOut) {
+                $query->whereBetween('check_in_date', [$checkIn, $checkOut])
+                      ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
+                      ->orWhere(function ($q) use ($checkIn, $checkOut) {
+                          $q->where('check_in_date', '<=', $checkIn)
+                            ->where('check_out_date', '>=', $checkOut);
+                      });
+            })
+            ->exists();
+
+        return ! $conflicting;
+    }
 }
