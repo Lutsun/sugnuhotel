@@ -6,22 +6,6 @@ import { AuthService } from '../../core/services/auth.service';
   selector: 'app-header',
   imports: [RouterLink, RouterLinkActive],
   template: `
-    <div class="hidden sm:block bg-ink-900 text-ink-100 text-xs">
-      <div class="max-w-6xl mx-auto px-4 h-9 flex items-center justify-between">
-        <div class="flex items-center gap-5">
-          <span class="flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h1.5a1 1 0 01.98.804l.6 3a1 1 0 01-.27.92l-1.2 1.2a12.04 12.04 0 005.6 5.6l1.2-1.2a1 1 0 01.92-.27l3 .6a1 1 0 01.804.98V17a1 1 0 01-1 1h-1C7.82 18 2 12.18 2 5V4a1 1 0 010-1z"/></svg>
-            +221 33 800 00 00
-          </span>
-          <span class="flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M2.94 4.94a1.5 1.5 0 011.06-.44h12a1.5 1.5 0 011.06.44L10 10.5 2.94 4.94zM2 6.4V14.5A1.5 1.5 0 003.5 16h13a1.5 1.5 0 001.5-1.5V6.4l-7.55 5.66a1 1 0 01-1.2 0L2 6.4z"/></svg>
-            contact&#64;sugnuhotel.sn
-          </span>
-        </div>
-        <span>Dakar, Sénégal</span>
-      </div>
-    </div>
-
     <header class="bg-white/95 backdrop-blur border-b border-ink-100 sticky top-0 z-40">
       <div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
         <a routerLink="/" class="flex items-center gap-2 font-display text-2xl font-semibold text-ink-900">
