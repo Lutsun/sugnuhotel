@@ -1,59 +1,92 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SugnuHotel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Application de réservation d'hôtel — backend API Laravel (Sanctum) + frontend Angular.
 
-## About Laravel
+## Architecture
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+```
+sugnuhotel/
+├── app/                    Backend Laravel — API pure (aucune vue Blade)
+│   ├── Http/Controllers/Api/   Contrôleurs API (public, client, admin, réception)
+│   ├── Http/Resources/         Sérialisation JSON
+│   ├── Models/                 Eloquent (User, Room, RoomType, Reservation, Service...)
+│   └── Mail/                   Emails (confirmation, annulation, modification)
+├── routes/api.php          Toutes les routes de l'API (auth:sanctum + role)
+├── database/                Migrations, seeders, factories
+├── tests/Feature/Api/       Tests Pest de l'API
+└── frontend/                Application Angular (SPA)
+    └── src/app/
+        ├── core/            Services HTTP, guards, intercepteurs, modèles TS
+        ├── shared/          Layout (header/footer), composants UI réutilisables
+        └── features/        Pages par domaine (public, auth, client, admin, réception)
+```
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Rôles
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **client** : recherche/réservation de chambres, historique, annulation, profil
+- **receptionist** : dashboard, calendrier, check-in/check-out, gestion des réservations
+- **admin** : tout ce qui précède + CRUD chambres/types de chambres/services/utilisateurs
 
-## Learning Laravel
+Voir [COMPTES-TEST.md](COMPTES-TEST.md) pour des comptes de démonstration.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Lancer le projet en local
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Backend
 
-## Laravel Sponsors
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+# configurer DB_* dans .env (MySQL), puis :
+php artisan migrate --seed
+php artisan serve
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+L'API est servie sur `http://localhost:8000/api`.
 
-### Premium Partners
+### Frontend
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+cd frontend
+npm install
+npm run start
+```
 
-## Contributing
+L'application est servie sur `http://localhost:4200`.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Tests
 
-## Code of Conduct
+```bash
+php artisan test
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Stack technique
 
-## Security Vulnerabilities
+- **Backend** : Laravel 12, Sanctum (auth par token), MySQL
+- **Frontend** : Angular 22 (standalone components, signals), Tailwind CSS v4, FullCalendar
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Déploiement
 
-## License
+### Frontend (Vercel)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Le dossier `frontend/vercel.json` est déjà configuré (build, dossier de sortie, réécriture SPA).
+
+1. Avant le build, mettre à jour `frontend/src/environments/environment.prod.ts` avec l'URL réelle de l'API déployée.
+2. Sur Vercel : nouveau projet → Root Directory = `frontend` → Framework Preset = Angular (ou "Other", `vercel.json` fait le reste).
+3. Déployer. Vercel détecte `npm run build` et sert `dist/frontend/browser`.
+
+### Backend (Railway / Render — pas Vercel)
+
+Vercel n'est pas adapté à une vraie application Laravel (pas de runtime PHP persistant, pas de cron/queue, connexions DB par requête). Utiliser un hébergeur pensé pour PHP :
+
+1. Créer un service à partir du repo (Railway/Render détectent Laravel via `composer.json`).
+2. Ajouter une base MySQL (souvent un add-on du même hébergeur).
+3. Variables d'environnement à définir : toutes celles de `.env.example`, en particulier :
+   - `APP_KEY` (générer avec `php artisan key:generate --show`)
+   - `APP_ENV=production`, `APP_DEBUG=false`
+   - `DB_*` (fournis par l'add-on MySQL)
+   - `FRONTEND_URL` = l'URL Vercel du frontend (nécessaire pour le CORS et les liens dans les emails)
+   - `MAIL_*` pour envoyer réellement les emails (confirmation/annulation/modification) — `MAIL_MAILER=log` n'envoie rien, c'est un mode debug local uniquement
+4. Après le premier déploiement : `php artisan migrate --seed --force` et `php artisan storage:link` (nécessaire pour que les photos de chambres téléversées par l'admin soient accessibles).
+
+⚠️ Le stockage local des images (`storage/app/public`) n'est généralement pas persistant sur ce type d'hébergeur (le système de fichiers est recréé à chaque déploiement). Pour des photos de chambres qui survivent aux redéploiements en production, prévoir un stockage externe (S3 ou équivalent) plus tard si besoin — non nécessaire pour un usage de démonstration/projet académique.
