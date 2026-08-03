@@ -88,8 +88,18 @@ Vercel n'est pas adapté à une vraie application Laravel (pas de runtime PHP pe
 3. `railway.json` définit :
    - `preDeployCommand` : exécute `php artisan migrate --force` puis `storage:link` avant chaque déploiement (équivalent d'une release phase Heroku)
    - `healthcheckPath: /api/home` — **pas `/up`** : le proxy Caddy auto-généré par Railway pour Laravel ne route pas correctement cette route de santé par défaut de Laravel, `/api/home` fonctionne de manière fiable
-4. Variables d'environnement définies manuellement : `APP_KEY`, `APP_ENV=production`, `APP_DEBUG=false`, `DB_*`, `FRONTEND_URL` (URL Vercel, pour CORS + liens dans les emails), `MAIL_*`.
+4. Variables d'environnement définies manuellement : `APP_KEY`, `APP_ENV=production`, `APP_DEBUG=false`, `DB_*`, `FRONTEND_URL` (URL Vercel, pour CORS + liens dans les emails), `MAIL_MAILER=brevo`, `BREVO_API_KEY`, `MAIL_FROM_ADDRESS=contact@dasylva.dev`.
 
-⚠️ `MAIL_MAILER=log` en production actuellement : les emails ne partent pas réellement, juste écrits dans les logs. À changer pour un vrai fournisseur (Resend, Brevo, Mailtrap...) si besoin.
+### Emails (Brevo, via API HTTP — pas SMTP)
+
+Railway (comme beaucoup d'hébergeurs cloud) bloque les ports SMTP sortants (25, 465, 587) pour lutter contre le spam. L'envoi passe donc par l'**API HTTP de Brevo** plutôt que par un relais SMTP classique :
+
+- Package `symfony/brevo-mailer` + `symfony/http-client`
+- Transport personnalisé enregistré dans `AppServiceProvider::boot()` via `Mail::extend('brevo', ...)`, DSN `brevo+api`
+- `config/mail.php` : mailer `brevo` (transport `brevo`) ; `config/services.php` : `services.brevo.key` ← `BREVO_API_KEY`
+- L'expéditeur `contact@dasylva.dev` est vérifié dans Brevo par confirmation d'email (pas de DNS nécessaire)
+- ⚠️ Si la restriction "Authorised IPs" de Brevo est activée, l'IP sortante de Railway change (pool dynamique, pas d'IP fixe) — la désactiver entièrement plutôt que d'ajouter des IPs une par une (https://app.brevo.com/security/authorised_ips)
+
+En local, le SMTP classique fonctionne très bien (`MAIL_MAILER=smtp` avec les identifiants SMTP Brevo) puisque rien n'y bloque le port 587 — seule la prod sur Railway a besoin du transport API.
 
 ⚠️ Le stockage local des images (`storage/app/public`) n'est pas persistant sur Railway (le système de fichiers est recréé à chaque déploiement). Pour des photos de chambres qui survivent aux redéploiements, prévoir un stockage externe (S3 ou équivalent) plus tard si besoin — non nécessaire pour un usage de démonstration/projet académique.
