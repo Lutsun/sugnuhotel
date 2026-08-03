@@ -3,7 +3,7 @@
 Application de réservation d'hôtel — backend API Laravel (Sanctum) + frontend Angular.
 
 **En ligne :**
-- Frontend : https://frontend-ashen-three-31.vercel.app
+- Frontend : https://sugnuhotel.vercel.app
 - API : https://backend-production-e47d.up.railway.app/api
 
 ## Architecture
