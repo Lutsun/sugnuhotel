@@ -3,7 +3,10 @@
 namespace App\Providers;
 
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
+use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory;
+use Symfony\Component\Mailer\Transport\Dsn;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,6 +31,14 @@ class AppServiceProvider extends ServiceProvider
             return rtrim(config('app.frontend_url'), '/')
                 .'/reset-password?token='.$token
                 .'&email='.urlencode($notifiable->getEmailForPasswordReset());
+        });
+
+        // Envoi via l'API HTTP de Brevo plutôt que le SMTP : certains hébergeurs (Railway...)
+        // bloquent les ports SMTP sortants, mais laissent passer le HTTPS.
+        Mail::extend('brevo', function () {
+            return (new BrevoTransportFactory())->create(
+                new Dsn('brevo+api', 'default', config('services.brevo.key'))
+            );
         });
     }
 }
