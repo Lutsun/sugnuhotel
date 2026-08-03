@@ -2,6 +2,10 @@
 
 Application de réservation d'hôtel — backend API Laravel (Sanctum) + frontend Angular.
 
+**En ligne :**
+- Frontend : https://frontend-ashen-three-31.vercel.app
+- API : https://backend-production-e47d.up.railway.app/api
+
 ## Architecture
 
 ```
@@ -75,18 +79,17 @@ Le dossier `frontend/vercel.json` est déjà configuré (build, dossier de sorti
 2. Sur Vercel : nouveau projet → Root Directory = `frontend` → Framework Preset = Angular (ou "Other", `vercel.json` fait le reste).
 3. Déployer. Vercel détecte `npm run build` et sert `dist/frontend/browser`.
 
-### Backend (Railway / Render — pas Vercel)
+### Backend (Railway — pas Vercel)
 
-Vercel n'est pas adapté à une vraie application Laravel (pas de runtime PHP persistant, pas de cron/queue, connexions DB par requête). Utiliser un hébergeur pensé pour PHP :
+Vercel n'est pas adapté à une vraie application Laravel (pas de runtime PHP persistant, pas de cron/queue, connexions DB par requête). Ce projet est déployé sur **Railway** :
 
-1. Créer un service à partir du repo (Railway/Render détectent Laravel via `composer.json`).
-2. Ajouter une base MySQL (souvent un add-on du même hébergeur).
-3. Variables d'environnement à définir : toutes celles de `.env.example`, en particulier :
-   - `APP_KEY` (générer avec `php artisan key:generate --show`)
-   - `APP_ENV=production`, `APP_DEBUG=false`
-   - `DB_*` (fournis par l'add-on MySQL)
-   - `FRONTEND_URL` = l'URL Vercel du frontend (nécessaire pour le CORS et les liens dans les emails)
-   - `MAIL_*` pour envoyer réellement les emails (confirmation/annulation/modification) — `MAIL_MAILER=log` n'envoie rien, c'est un mode debug local uniquement
-4. Après le premier déploiement : `php artisan migrate --seed --force` et `php artisan storage:link` (nécessaire pour que les photos de chambres téléversées par l'admin soient accessibles).
+1. Service `backend` connecté au repo GitHub (branche `main`) → redéploiement automatique à chaque push.
+2. Service `MySQL` (add-on Railway) — les identifiants sont référencés dans les variables de `backend` via `${{MySQL.MYSQLHOST}}`, etc.
+3. `railway.json` définit :
+   - `preDeployCommand` : exécute `php artisan migrate --force` puis `storage:link` avant chaque déploiement (équivalent d'une release phase Heroku)
+   - `healthcheckPath: /api/home` — **pas `/up`** : le proxy Caddy auto-généré par Railway pour Laravel ne route pas correctement cette route de santé par défaut de Laravel, `/api/home` fonctionne de manière fiable
+4. Variables d'environnement définies manuellement : `APP_KEY`, `APP_ENV=production`, `APP_DEBUG=false`, `DB_*`, `FRONTEND_URL` (URL Vercel, pour CORS + liens dans les emails), `MAIL_*`.
 
-⚠️ Le stockage local des images (`storage/app/public`) n'est généralement pas persistant sur ce type d'hébergeur (le système de fichiers est recréé à chaque déploiement). Pour des photos de chambres qui survivent aux redéploiements en production, prévoir un stockage externe (S3 ou équivalent) plus tard si besoin — non nécessaire pour un usage de démonstration/projet académique.
+⚠️ `MAIL_MAILER=log` en production actuellement : les emails ne partent pas réellement, juste écrits dans les logs. À changer pour un vrai fournisseur (Resend, Brevo, Mailtrap...) si besoin.
+
+⚠️ Le stockage local des images (`storage/app/public`) n'est pas persistant sur Railway (le système de fichiers est recréé à chaque déploiement). Pour des photos de chambres qui survivent aux redéploiements, prévoir un stockage externe (S3 ou équivalent) plus tard si besoin — non nécessaire pour un usage de démonstration/projet académique.
