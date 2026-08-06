@@ -13,10 +13,10 @@ import { roomTypeImage } from '../../shared/ui/room-type-images';
   template: `
     <!-- Hero -->
     <section
-      class="relative bg-ink-900 overflow-hidden bg-cover bg-center min-h-[92vh] flex items-center"
+      class="relative bg-ink-900 overflow-hidden bg-cover bg-center min-h-[82vh] flex items-center"
       style="background-image: linear-gradient(180deg, rgba(10,12,18,.35) 0%, rgba(10,12,18,.35) 45%, rgba(10,12,18,.85) 100%), url('/images/hero-main.jpg')"
     >
-      <div class="max-w-6xl mx-auto px-4 pt-24 pb-40 text-center relative z-10 w-full">
+      <div class="max-w-6xl mx-auto px-4 py-24 text-center relative z-10 w-full">
         <span class="inline-block text-brand-300 text-xs font-semibold tracking-[0.2em] uppercase mb-5">Bienvenue à Dakar</span>
         <h1 class="font-display text-5xl sm:text-7xl font-semibold text-white text-balance leading-tight mb-6 [text-shadow:0_2px_24px_rgba(0,0,0,.35)]">
           L'hospitalité sénégalaise,<br class="hidden sm:block" /> réinventée pour vous
@@ -33,37 +33,34 @@ import { roomTypeImage } from '../../shared/ui/room-type-images';
           </a>
         </div>
       </div>
-
-      <!-- Quick search card, à cheval sur le hero -->
-      <div class="max-w-4xl mx-auto px-4 absolute inset-x-0 bottom-0 z-10 translate-y-1/2">
-        <form
-          (ngSubmit)="quickSearch()"
-          class="bg-white rounded-2xl shadow-2xl shadow-black/30 p-5 grid sm:grid-cols-4 gap-3"
-        >
-          <div class="text-left">
-            <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wide mb-1">Arrivée</label>
-            <input type="date" [(ngModel)]="checkIn" name="checkIn" class="w-full border border-ink-100 rounded-lg px-3 py-2 text-sm" />
-          </div>
-          <div class="text-left">
-            <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wide mb-1">Départ</label>
-            <input type="date" [(ngModel)]="checkOut" name="checkOut" class="w-full border border-ink-100 rounded-lg px-3 py-2 text-sm" />
-          </div>
-          <div class="text-left">
-            <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wide mb-1">Voyageurs</label>
-            <input type="number" min="1" [(ngModel)]="adults" name="adults" class="w-full border border-ink-100 rounded-lg px-3 py-2 text-sm" />
-          </div>
-          <button
-            type="submit"
-            class="self-end bg-brand-600 text-white font-semibold rounded-lg py-2.5 hover:bg-brand-700 transition"
-          >
-            Vérifier la disponibilité
-          </button>
-        </form>
-      </div>
     </section>
 
-    <!-- Espace réservé pour la carte de recherche qui chevauche le hero -->
-    <div class="h-16 sm:h-10"></div>
+    <!-- Quick search card, à cheval sur le bas du hero -->
+    <div class="relative z-10 max-w-4xl mx-auto px-4 -mt-10 sm:-mt-12">
+      <form
+        (ngSubmit)="quickSearch()"
+        class="bg-white rounded-2xl shadow-2xl shadow-black/30 p-5 grid sm:grid-cols-4 gap-3"
+      >
+        <div class="text-left">
+          <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wide mb-1">Arrivée</label>
+          <input type="date" [(ngModel)]="checkIn" name="checkIn" class="w-full border border-ink-100 rounded-lg px-3 py-2 text-sm" />
+        </div>
+        <div class="text-left">
+          <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wide mb-1">Départ</label>
+          <input type="date" [(ngModel)]="checkOut" name="checkOut" class="w-full border border-ink-100 rounded-lg px-3 py-2 text-sm" />
+        </div>
+        <div class="text-left">
+          <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wide mb-1">Voyageurs</label>
+          <input type="number" min="1" [(ngModel)]="adults" name="adults" class="w-full border border-ink-100 rounded-lg px-3 py-2 text-sm" />
+        </div>
+        <button
+          type="submit"
+          class="self-end bg-brand-600 text-white font-semibold rounded-lg py-2.5 hover:bg-brand-700 transition"
+        >
+          Vérifier la disponibilité
+        </button>
+      </form>
+    </div>
 
     <!-- Points forts -->
     <section class="max-w-6xl mx-auto px-4 pt-8 pb-20">
