@@ -2,7 +2,7 @@
 
 Toutes les photos utilisées sur ce site proviennent de Wikimedia Commons (contenus sous licence libre CC0 / CC BY-SA).
 
-- `hero-lobby.jpg` — "Entrance lobby of Amantaka luxury Resort & Hotel at blue hour in Luang Prabang Laos" — Basile Morin — CC BY-SA 4.0
+- `hero-main.jpg` — "Endless Water" (Unsplash) — CC0
 - `pool.jpg` — "Swimming pool and main building of Amantaka luxury Resort & Hotel in Luang Prabang Laos" — Basile Morin — CC BY-SA 4.0
 - `rooms/standard.jpg` — "Apartment hotel Nice" — CC0
 - `rooms/deluxe.jpg` — "Canopy bed of Amantaka Suite in Amantaka luxury Resort & Hotel in Luang Prabang Laos" — Basile Morin — CC BY-SA 4.0

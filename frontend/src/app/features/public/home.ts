@@ -12,30 +12,33 @@ import { roomTypeImage } from '../../shared/ui/room-type-images';
   imports: [RouterLink, DecimalPipe, FormsModule, RoomThumbnail],
   template: `
     <!-- Hero -->
-    <section class="relative bg-ink-900 overflow-hidden bg-cover bg-center" style="background-image: linear-gradient(180deg, rgba(18,20,26,.55), rgba(18,20,26,.85)), url('/images/hero-lobby.jpg')">
-      <div class="max-w-6xl mx-auto px-4 pt-20 pb-32 text-center relative z-10">
-        <span class="inline-block text-brand-300 text-xs font-semibold tracking-[0.2em] uppercase mb-4">Bienvenue à Dakar</span>
-        <h1 class="font-display text-4xl sm:text-6xl font-semibold text-white text-balance leading-tight mb-5">
+    <section
+      class="relative bg-ink-900 overflow-hidden bg-cover bg-center min-h-[92vh] flex items-center"
+      style="background-image: linear-gradient(180deg, rgba(10,12,18,.35) 0%, rgba(10,12,18,.35) 45%, rgba(10,12,18,.85) 100%), url('/images/hero-main.jpg')"
+    >
+      <div class="max-w-6xl mx-auto px-4 pt-24 pb-40 text-center relative z-10 w-full">
+        <span class="inline-block text-brand-300 text-xs font-semibold tracking-[0.2em] uppercase mb-5">Bienvenue à Dakar</span>
+        <h1 class="font-display text-5xl sm:text-7xl font-semibold text-white text-balance leading-tight mb-6 [text-shadow:0_2px_24px_rgba(0,0,0,.35)]">
           L'hospitalité sénégalaise,<br class="hidden sm:block" /> réinventée pour vous
         </h1>
-        <p class="text-ink-100/80 text-lg max-w-xl mx-auto mb-10">
+        <p class="text-white/85 text-lg sm:text-xl max-w-xl mx-auto mb-10">
           Chambres élégantes, service attentionné et une adresse au cœur de la ville. SugnuHotel vous accueille comme chez vous.
         </p>
         <div class="flex items-center justify-center gap-3 flex-wrap">
-          <a routerLink="/rooms" class="bg-white text-ink-900 font-semibold px-6 py-3 rounded-full hover:bg-brand-50 transition shadow-lg">
+          <a routerLink="/rooms" class="bg-white text-ink-900 font-semibold px-7 py-3.5 rounded-full hover:bg-brand-50 transition shadow-lg">
             Découvrir nos chambres
           </a>
-          <a routerLink="/booking/search" class="border border-white/30 text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 transition">
+          <a routerLink="/booking/search" class="border border-white/40 text-white font-semibold px-7 py-3.5 rounded-full hover:bg-white/10 transition backdrop-blur-sm">
             Réserver maintenant
           </a>
         </div>
       </div>
 
       <!-- Quick search card, à cheval sur le hero -->
-      <div class="max-w-4xl mx-auto px-4 relative z-10 -mb-16">
+      <div class="max-w-4xl mx-auto px-4 absolute inset-x-0 bottom-0 z-10 translate-y-1/2">
         <form
           (ngSubmit)="quickSearch()"
-          class="bg-white rounded-2xl shadow-2xl shadow-black/20 p-5 grid sm:grid-cols-4 gap-3 -translate-y-16"
+          class="bg-white rounded-2xl shadow-2xl shadow-black/30 p-5 grid sm:grid-cols-4 gap-3"
         >
           <div class="text-left">
             <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wide mb-1">Arrivée</label>
@@ -58,6 +61,9 @@ import { roomTypeImage } from '../../shared/ui/room-type-images';
         </form>
       </div>
     </section>
+
+    <!-- Espace réservé pour la carte de recherche qui chevauche le hero -->
+    <div class="h-16 sm:h-10"></div>
 
     <!-- Points forts -->
     <section class="max-w-6xl mx-auto px-4 pt-8 pb-20">
