@@ -35,7 +35,7 @@ import { roomTypeImage } from '../../shared/ui/room-type-images';
       </div>
 
       <!-- Quick search card : en flux normal, léger chevauchement sur la photo -->
-      <div class="relative z-10 max-w-4xl mx-auto px-4 -mt-2 sm:-mt-4 pb-10 sm:pb-14 w-full">
+      <div class="relative z-10 max-w-4xl mx-auto px-4 mt-6 sm:mt-10 pb-10 sm:pb-14 w-full">
         <form
           (ngSubmit)="quickSearch()"
           class="bg-white rounded-2xl shadow-2xl shadow-black/30 p-5 grid sm:grid-cols-4 gap-3"
