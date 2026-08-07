@@ -16,7 +16,7 @@ import { roomTypeImage } from '../../shared/ui/room-type-images';
       class="relative bg-ink-900 overflow-hidden bg-cover bg-center min-h-screen flex flex-col items-center justify-center"
       style="background-image: linear-gradient(180deg, rgba(10,12,18,.35) 0%, rgba(10,12,18,.35) 45%, rgba(10,12,18,.85) 100%), url('/images/hero-main.jpg')"
     >
-      <div class="max-w-6xl mx-auto px-4 pt-24 pb-10 sm:pb-44 text-center relative z-10 w-full">
+      <div class="max-w-6xl mx-auto px-4 pt-8 sm:pt-12 pb-10 sm:pb-32 text-center relative z-10 w-full">
         <span class="inline-block text-brand-300 text-xs font-semibold tracking-[0.2em] uppercase mb-5">Bienvenue à Dakar</span>
         <h1 class="font-display text-5xl sm:text-7xl font-semibold text-white text-balance leading-tight mb-6 [text-shadow:0_2px_24px_rgba(0,0,0,.35)]">
           L'hospitalité sénégalaise,<br class="hidden sm:block" /> réinventée pour vous
