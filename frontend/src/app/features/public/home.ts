@@ -13,10 +13,10 @@ import { roomTypeImage } from '../../shared/ui/room-type-images';
   template: `
     <!-- Hero -->
     <section
-      class="relative bg-ink-900 overflow-hidden bg-cover bg-center min-h-[78vh] flex flex-col items-center justify-start"
+      class="relative bg-ink-900 overflow-hidden bg-cover bg-center min-h-[92vh] flex flex-col items-center justify-start"
       style="background-image: linear-gradient(180deg, rgba(10,12,18,.35) 0%, rgba(10,12,18,.35) 45%, rgba(10,12,18,.85) 100%), url('/images/hero-main.jpg')"
     >
-      <div class="max-w-6xl mx-auto px-4 pt-6 sm:pt-10 pb-10 sm:pb-24 text-center relative z-10 w-full">
+      <div class="max-w-6xl mx-auto px-4 pt-6 sm:pt-10 pb-10 sm:pb-14 text-center relative z-10 w-full">
         <span class="inline-block text-brand-300 text-xs font-semibold tracking-[0.2em] uppercase mb-5">Bienvenue à Dakar</span>
         <h1 class="font-display text-5xl sm:text-7xl font-semibold text-white text-balance leading-tight mb-6 [text-shadow:0_2px_24px_rgba(0,0,0,.35)]">
           L'hospitalité sénégalaise,<br class="hidden sm:block" /> réinventée pour vous
@@ -34,11 +34,11 @@ import { roomTypeImage } from '../../shared/ui/room-type-images';
         </div>
       </div>
 
-      <!-- Quick search card : en flux normal sur mobile, ancrée sur la photo à partir de sm -->
-      <div class="relative sm:absolute inset-x-0 sm:bottom-10 z-10 px-4 pb-10 sm:pb-0 w-full">
+      <!-- Quick search card : en flux normal, léger chevauchement sur la photo -->
+      <div class="relative z-10 max-w-4xl mx-auto px-4 -mt-8 sm:-mt-10 pb-10 sm:pb-14 w-full">
         <form
           (ngSubmit)="quickSearch()"
-          class="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl shadow-black/30 p-5 grid sm:grid-cols-4 gap-3"
+          class="bg-white rounded-2xl shadow-2xl shadow-black/30 p-5 grid sm:grid-cols-4 gap-3"
         >
           <div class="text-left">
             <label class="block text-xs font-semibold text-ink-400 uppercase tracking-wide mb-1">Arrivée</label>
