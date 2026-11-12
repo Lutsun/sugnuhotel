@@ -10,8 +10,16 @@ cd /var/www/html
 
 php artisan config:clear
 php artisan migrate --force
-# Les seeders sont idempotents : comptes de démonstration, chambres et services.
-php artisan db:seed --force
+# Données de base (idempotentes) : services, types de chambres et chambres.
+php artisan db:seed --class=ServiceSeeder --force
+php artisan db:seed --class=RoomTypeSeeder --force
+php artisan db:seed --class=RoomSeeder --force
+
+# Comptes de démonstration (mots de passe publics, voir COMPTES-TEST.md) :
+# créés uniquement si SEED_DEMO_USERS=true. À désactiver une fois la démo terminée.
+if [ "${SEED_DEMO_USERS:-false}" = "true" ]; then
+  php artisan db:seed --class=AdminUserSeeder --force
+fi
 php artisan storage:link || true
 php artisan config:cache
 php artisan route:cache

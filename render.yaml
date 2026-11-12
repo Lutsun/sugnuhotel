@@ -41,6 +41,8 @@ services:
         value: SugnuHotel
       - key: BREVO_API_KEY
         sync: false
+      - key: SEED_DEMO_USERS
+        value: "true"
       - key: SESSION_DRIVER
         value: file
       - key: CACHE_STORE
