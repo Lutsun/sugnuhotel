@@ -17,8 +17,13 @@ php artisan db:seed --class=RoomSeeder --force
 
 # Comptes de démonstration (mots de passe publics, voir COMPTES-TEST.md) :
 # créés uniquement si SEED_DEMO_USERS=true. À désactiver une fois la démo terminée.
-if [ "${SEED_DEMO_USERS:-false}" = "true" ]; then
+SEED_DEMO="$(printf '%s' "${SEED_DEMO_USERS:-false}" | tr -d ' "\r' | tr 'A-Z' 'a-z')"
+echo "[entrypoint] SEED_DEMO_USERS=${SEED_DEMO}"
+if [ "$SEED_DEMO" = "true" ]; then
   php artisan db:seed --class=AdminUserSeeder --force
+  echo "[entrypoint] Comptes de démonstration : $(php artisan tinker --execute='echo App\Models\User::count();') utilisateur(s) en base."
+else
+  echo "[entrypoint] Comptes de démonstration ignorés."
 fi
 php artisan storage:link || true
 php artisan config:cache
