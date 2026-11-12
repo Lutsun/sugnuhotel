@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: sugnuhotel-api
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/home
+    envVars:
+      - key: APP_NAME
+        value: SugnuHotel
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: FRONTEND_URL
+        value: https://sugnuhotel.vercel.app
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "4000"
+      - key: DB_DATABASE
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: MYSQL_ATTR_SSL_CA
+        value: /etc/ssl/certs/ca-certificates.crt
+      - key: MAIL_MAILER
+        value: brevo
+      - key: MAIL_FROM_ADDRESS
+        value: contact@dasylva.dev
+      - key: MAIL_FROM_NAME
+        value: SugnuHotel
+      - key: BREVO_API_KEY
+        sync: false
+      - key: SESSION_DRIVER
+        value: file
+      - key: CACHE_STORE
+        value: file
