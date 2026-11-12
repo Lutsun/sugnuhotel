@@ -8,6 +8,9 @@ sed -ri "s/<VirtualHost \*:80>/<VirtualHost *:${PORT}>/" /etc/apache2/sites-avai
 
 cd /var/www/html
 
+# Les erreurs Laravel doivent apparaître dans les logs Render.
+export LOG_CHANNEL="${LOG_CHANNEL:-stderr}"
+
 php artisan config:clear
 php artisan migrate --force
 # Données de base (idempotentes) : services, types de chambres et chambres.
@@ -28,5 +31,8 @@ fi
 php artisan storage:link || true
 php artisan config:cache
 php artisan route:cache
+
+# Les commandes artisan tournent en root : on rend le stockage à Apache (www-data).
+chown -R www-data:www-data storage bootstrap/cache
 
 exec apache2-foreground
