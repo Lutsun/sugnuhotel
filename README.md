@@ -4,7 +4,7 @@ Application de réservation d'hôtel — backend API Laravel (Sanctum) + fronten
 
 **En ligne :**
 - Frontend : https://sugnuhotel.vercel.app
-- API : https://backend-production-e47d.up.railway.app/api
+- API : https://sugnuhotel-q0kr.onrender.com/api (offre gratuite : la première requête après une période d'inactivité peut prendre 30 à 60 s)
 
 ## Architecture
 
@@ -79,27 +79,25 @@ Le dossier `frontend/vercel.json` est déjà configuré (build, dossier de sorti
 2. Sur Vercel : nouveau projet → Root Directory = `frontend` → Framework Preset = Angular (ou "Other", `vercel.json` fait le reste).
 3. Déployer. Vercel détecte `npm run build` et sert `dist/frontend/browser`.
 
-### Backend (Railway — pas Vercel)
+### Backend (Render + TiDB Cloud — pas Vercel)
 
-Vercel n'est pas adapté à une vraie application Laravel (pas de runtime PHP persistant, pas de cron/queue, connexions DB par requête). Ce projet est déployé sur **Railway** :
+Vercel n'est pas adapté à une vraie application Laravel (pas de runtime PHP persistant, pas de cron/queue, connexions DB par requête). L'API est déployée sur **Render** (service web Docker, offre gratuite) avec une base MySQL **TiDB Cloud Serverless** :
 
-1. Service `backend` connecté au repo GitHub (branche `main`) → redéploiement automatique à chaque push.
-2. Service `MySQL` (add-on Railway) — les identifiants sont référencés dans les variables de `backend` via `${{MySQL.MYSQLHOST}}`, etc.
-3. `railway.json` définit :
-   - `preDeployCommand` : exécute `php artisan migrate --force` puis `storage:link` avant chaque déploiement (équivalent d'une release phase Heroku)
-   - `healthcheckPath: /api/home` — **pas `/up`** : le proxy Caddy auto-généré par Railway pour Laravel ne route pas correctement cette route de santé par défaut de Laravel, `/api/home` fonctionne de manière fiable
-4. Variables d'environnement définies manuellement : `APP_KEY`, `APP_ENV=production`, `APP_DEBUG=false`, `DB_*`, `FRONTEND_URL` (URL Vercel, pour CORS + liens dans les emails), `MAIL_MAILER=brevo`, `BREVO_API_KEY`, `MAIL_FROM_ADDRESS=contact@dasylva.dev`.
+1. Service web connecté au repo GitHub (branche `main`) ; le `Dockerfile` construit l'image (PHP 8.3 + Apache).
+2. `docker/entrypoint.sh` s'exécute à chaque démarrage : migrations, seeders de base (services, types de chambres, chambres), `storage:link`, mise en cache de la config et des routes.
+3. Variables d'environnement (voir `render.yaml` pour la liste) : `APP_KEY`, `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL`, `FRONTEND_URL` (URL Vercel, pour CORS + liens dans les emails), `DB_HOST`, `DB_PORT=4000`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `MYSQL_ATTR_SSL_CA=/etc/ssl/certs/ca-certificates.crt` (TiDB impose le SSL), `LOG_CHANNEL=stderr`, `MAIL_MAILER=brevo`, `BREVO_API_KEY`, `MAIL_FROM_ADDRESS`.
+4. Comptes de démonstration : créés uniquement si `SEED_DEMO_USERS=true` (voir `COMPTES-TEST.md`). À désactiver une fois la démonstration terminée.
 
 ### Emails (Brevo, via API HTTP — pas SMTP)
 
-Railway (comme beaucoup d'hébergeurs cloud) bloque les ports SMTP sortants (25, 465, 587) pour lutter contre le spam. L'envoi passe donc par l'**API HTTP de Brevo** plutôt que par un relais SMTP classique :
+Les hébergeurs cloud gratuits (Render, Railway...) bloquent les ports SMTP sortants (25, 465, 587) pour lutter contre le spam. L'envoi passe donc par l'**API HTTP de Brevo** plutôt que par un relais SMTP classique :
 
 - Package `symfony/brevo-mailer` + `symfony/http-client`
 - Transport personnalisé enregistré dans `AppServiceProvider::boot()` via `Mail::extend('brevo', ...)`, DSN `brevo+api`
 - `config/mail.php` : mailer `brevo` (transport `brevo`) ; `config/services.php` : `services.brevo.key` ← `BREVO_API_KEY`
 - L'expéditeur `contact@dasylva.dev` est vérifié dans Brevo par confirmation d'email (pas de DNS nécessaire)
-- ⚠️ Si la restriction "Authorised IPs" de Brevo est activée, l'IP sortante de Railway change (pool dynamique, pas d'IP fixe) — la désactiver entièrement plutôt que d'ajouter des IPs une par une (https://app.brevo.com/security/authorised_ips)
+- ⚠️ Si la restriction "Authorised IPs" de Brevo est activée, l'IP sortante de l'hébergeur change (pool dynamique, pas d'IP fixe) — la désactiver entièrement plutôt que d'ajouter des IPs une par une (https://app.brevo.com/security/authorised_ips)
 
-En local, le SMTP classique fonctionne très bien (`MAIL_MAILER=smtp` avec les identifiants SMTP Brevo) puisque rien n'y bloque le port 587 — seule la prod sur Railway a besoin du transport API.
+En local, le SMTP classique fonctionne très bien (`MAIL_MAILER=smtp` avec les identifiants SMTP Brevo) puisque rien n'y bloque le port 587 — seule la production a besoin du transport API.
 
-⚠️ Le stockage local des images (`storage/app/public`) n'est pas persistant sur Railway (le système de fichiers est recréé à chaque déploiement). Pour des photos de chambres qui survivent aux redéploiements, prévoir un stockage externe (S3 ou équivalent) plus tard si besoin — non nécessaire pour un usage de démonstration/projet académique.
+⚠️ Le stockage local des images (`storage/app/public`) n'est pas persistant sur Render (le système de fichiers est recréé à chaque déploiement). Pour des photos de chambres qui survivent aux redéploiements, prévoir un stockage externe (S3 ou équivalent) plus tard si besoin — non nécessaire pour un usage de démonstration/projet académique.
