@@ -42,7 +42,7 @@ services:
       - key: BREVO_API_KEY
         sync: false
       - key: SEED_DEMO_USERS
-        value: "true"
+        sync: false
       - key: SESSION_DRIVER
         value: file
       - key: CACHE_STORE
